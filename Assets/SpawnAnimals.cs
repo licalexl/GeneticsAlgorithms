@@ -30,7 +30,7 @@ public class SpawnAnimals : MonoBehaviour
     public void Generar() 
     {
 
-        spawnPosition = new Vector3(gameObject.transform.position.x, 0, gameObject.transform.position.y);
+        spawnPosition = new Vector3(gameObject.transform.position.x, 0, gameObject.transform.position.z);
         Instantiate(objectToGenerate, spawnPosition, Quaternion.identity);
 
         timer = 0f;

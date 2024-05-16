@@ -277,6 +277,18 @@ public abstract class Animal : MonoBehaviour
 
             if (nombre == objeto1.nombre && sexo != objeto1.sexo && objeto1.state == State.Procrear)
             {
+                objeto2.state = State.MovingRandomly;
+                objeto1.state = State.MovingRandomly;
+                cambio = true;
+                objeto1.cambio = true;
+                objeto2.cambio = true;
+
+                objeto2.hambre = hambre-50;
+                objeto1.hambre = hambre - 50;
+
+                objeto2.sed = sed - 70;
+                objeto1.sed = sed - 70;
+
                 GeneracionHijo(objeto2, objeto1);
             }
 
@@ -383,7 +395,7 @@ public abstract class Animal : MonoBehaviour
         }
         else if (state == State.Comer || state == State.Procrear)
         {
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(3f);
             StartCoroutine(Pensar());
         }
         else
@@ -574,8 +586,9 @@ public abstract class Animal : MonoBehaviour
 
         int rand1 = Random.Range(25, 180);
         int rand2 = Random.Range(-50, 110);
-        newObj.targetPosition = new Vector3(rand1, 0, rand2);       
+        newObj.targetPosition = new Vector3(rand1, 0, rand2);
 
+       
     }
 
 }
