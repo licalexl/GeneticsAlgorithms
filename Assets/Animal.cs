@@ -23,6 +23,7 @@ public abstract class Animal : MonoBehaviour
     [SerializeField] protected bool hijo=false;
     [SerializeField] protected bool alertado;
     [SerializeField] protected bool cambio=false;
+    [SerializeField] protected bool generandoHijo=false;
 
     public float rotationSpeed = 5f;
     public Vector3 targetPosition; 
@@ -288,8 +289,13 @@ public abstract class Animal : MonoBehaviour
 
                 objeto2.sed = sed - 70;
                 objeto1.sed = sed - 70;
+                if (generandoHijo == false)
+                {
+                    generandoHijo = true;
+                    GeneracionHijo(objeto2, objeto1);
+                }
 
-                GeneracionHijo(objeto2, objeto1);
+                
             }
 
         }
@@ -393,7 +399,7 @@ public abstract class Animal : MonoBehaviour
             yield return new WaitForSeconds(1f);
             StartCoroutine(Pensar());
         }
-        else if (state == State.Comer || state == State.Procrear)
+        else if (state == State.Comer ||  state == State.Procrear)
         {
             yield return new WaitForSeconds(3f);
             StartCoroutine(Pensar());

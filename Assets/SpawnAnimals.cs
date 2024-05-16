@@ -10,6 +10,7 @@ public class SpawnAnimals : MonoBehaviour
     public int Cantidad;
     public int suma=0;
     private float timer; // Temporizador para rastrear el tiempo entre generaciones
+    public bool comenzar=false;
 
 
     void Start()
