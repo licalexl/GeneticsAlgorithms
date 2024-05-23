@@ -6,6 +6,7 @@ public class Comenzar : MonoBehaviour
 {
     public SpawnAnimals[] spawnAnimals;
     public GameObject[] desactivacionObject;
+    public GameObject panel;
     void Start()
     {
         
@@ -24,6 +25,8 @@ public class Comenzar : MonoBehaviour
         {
             desactivacionObject[i].SetActive(false);
         }
+
+        panel.SetActive(true); 
 
     }
     // Update is called once per frame
