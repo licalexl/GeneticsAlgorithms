@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class SpawnAnimals : MonoBehaviour
 {
     public GameObject objectToGenerate;
@@ -12,21 +12,31 @@ public class SpawnAnimals : MonoBehaviour
     private float timer; 
     public bool comenzar=false;
     private string input;
-
+    public TMP_InputField inputField;
 
     void Start()
     {
-        timer = 0f;
+        
     }
     void Update()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= spawnInterval && suma<Cantidad)
+        if (comenzar ==false)
         {
-            suma++;
-            Generar();
+            int.TryParse(inputField.text, out Cantidad);
+            timer = 0f;
         }
+        if (comenzar == true) 
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= spawnInterval && suma < Cantidad)
+            {
+                suma++;
+                Generar();
+            }
+
+        }
+       
     }
 
     public void Generar() 
@@ -39,9 +49,9 @@ public class SpawnAnimals : MonoBehaviour
     }
 
 
-    public void AsignacionCantidad(int numeros)
+    public void AsignacionCantidad(string numeros)
     {
-        Cantidad = numeros;
+        //Cantidad = numeros;
     }
 
 
