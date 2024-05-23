@@ -7,6 +7,7 @@ public class Iguana : Animal
 
     protected override void Start()
     {
+        pointApareamiento = GameObject.Find("SpawnIguana");
         nombre = "Iguana";
         carnivoro = false;
         Generacion();

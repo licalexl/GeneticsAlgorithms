@@ -7,7 +7,7 @@ public class ObjectSpawner : MonoBehaviour
     public GameObject objectToGenerate;
     public Vector3 spawnPosition;
     public float spawnInterval = 10f; 
-    private float timer; // Temporizador para rastrear el tiempo entre generaciones
+    private float timer; 
 
 
     void Start()
@@ -26,8 +26,16 @@ public class ObjectSpawner : MonoBehaviour
 
     public void Generar() 
     {
+        int rand1;
+        int rand2;
+        do
+        {
+            rand1 = Random.Range(20, 180);
+            rand2 = Random.Range(-50, 110);
 
-        spawnPosition = new Vector3(Random.Range(20, 180), 0, Random.Range(-50, 110));
+        } while ((rand1 > 40 && rand1 < 95) && (rand2 > 29 && rand2 < 70));
+
+        spawnPosition = new Vector3(rand1, 0, rand2);
         // Generar el objeto en la posición especificada
         Instantiate(objectToGenerate, spawnPosition, Quaternion.identity);
 

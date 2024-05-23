@@ -8,6 +8,7 @@ public class Fox : Animal
     protected override void Start()
     {
         nombre = "Fox";
+        pointApareamiento = GameObject.Find("SpawnFox");
         carnivoro = false;
         Generacion();
     }

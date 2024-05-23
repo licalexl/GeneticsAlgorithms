@@ -7,6 +7,7 @@ public class Tigre : Animal
     
      protected override void Start()
     {
+        pointApareamiento = GameObject.Find("SpawnTigre");
         nombre = "Tigre";
         carnivoro = true;
         Generacion();

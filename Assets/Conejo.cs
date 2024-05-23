@@ -7,6 +7,7 @@ public class Conejo : Animal
 
     protected override void Start()
     {
+        pointApareamiento = GameObject.Find("SpawnConejo");
         nombre = "Conejo";
         carnivoro = false;
         Generacion();

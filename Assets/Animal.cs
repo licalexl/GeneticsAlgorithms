@@ -25,6 +25,16 @@ public abstract class Animal : MonoBehaviour
     [SerializeField] protected bool cambio=false;
     [SerializeField] protected bool generandoHijo=false;
 
+    [SerializeField] private float timer = 0f;
+    [SerializeField] private bool startTimer = false;
+
+
+
+    [SerializeField] private bool ignorando;
+
+
+    [SerializeField] protected GameObject pointApareamiento; 
+
     public float rotationSpeed = 5f;
     public Vector3 targetPosition; 
 
@@ -60,6 +70,50 @@ public abstract class Animal : MonoBehaviour
 
     private void Update()
     {
+        if (startTimer==true)
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= 7f)
+            {
+                state = State.MovingRandomly;
+                cambio = true;
+                StartCoroutine(Pensar());
+                startTimer = false;
+                timer = 0;
+            }
+        }
+
+        if (state == State.Procrear)
+        {
+            startTimer = true;
+        }
+
+        if (transform.position.y<-0.5)
+        {
+            Vector3 currentPosition = transform.position;
+
+            currentPosition.y = 0f;
+
+            transform.position = currentPosition;
+        }
+        if ((state == State.BuscarComida || state == State.Comer) && carnivoro ==false)
+        {
+            Physics.IgnoreLayerCollision(gameObject.layer, 6, false);
+        
+            ignorando = false;
+        }
+        else 
+        {
+          // Physics.IgnoreLayerCollision(gameObject.layer, 6, true);
+            ignorando = true;
+
+        }
+
+        if (carnivoro == true)
+        {
+            Physics.IgnoreLayerCollision(gameObject.layer, 6, true);
+        }
         Vector3 direction = (targetPosition - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -68,8 +122,10 @@ public abstract class Animal : MonoBehaviour
             rb.MovePosition(transform.position + transform.forward * velocidad * Time.deltaTime);
         }
         else
-        {
-            cambio = true;
+        {         
+               
+             StartCoroutine(Pensar());
+                       
         }
 
 
@@ -79,11 +135,20 @@ public abstract class Animal : MonoBehaviour
 
         if (cambio==true)
         {
+            float rand1;
+            float rand2;
             switch (state)
             {
                 case State.BuscarComida:
-                    int rand1 = Random.Range(25, 180);
-                    int rand2 = Random.Range(-50, 110);
+                   
+                    do
+                    {
+                       rand1 = Random.Range(25, 180);
+                       rand2 = Random.Range(-50, 110);
+
+                    } while((rand1 > 40 && rand1 < 95) && (rand2 > 29 && rand2 < 70));
+
+
 
                     targetPosition = new Vector3(rand1,0, rand2);
                     cambio = false;
@@ -92,16 +157,22 @@ public abstract class Animal : MonoBehaviour
 
                 case State.BuscarAgua:
 
-                    targetPosition = new Vector3(70, 0, 50);
+                    targetPosition = new Vector3(Random.Range(40, 90), 0, Random.Range(30, 60));
                     cambio = false;                     
                     
                     break;
 
                 case State.Escapar:
-                    int rand3 = Random.Range(20, 180);
-                    int rand4 = Random.Range(-50, 110);
 
-                    targetPosition = new Vector3(rand3, 0, rand4);
+                    do
+                    {
+                        rand1 = Random.Range(25, 180);
+                        rand2 = Random.Range(-50, 110);
+
+                    } while ((rand1 > 40 && rand1 < 95) && (rand2 > 29 && rand2 < 70));
+
+
+                    targetPosition = new Vector3(rand1, 0, rand2);
                     cambio = false; 
 
                     break;
@@ -114,19 +185,29 @@ public abstract class Animal : MonoBehaviour
 
                 case State.BuscarPareja:
 
-                    int rand5 = Random.Range(25, 180);
-                    int rand6 = Random.Range(-50, 110);
+                    do
+                    {
+                        rand1 = Random.Range(pointApareamiento.gameObject.transform.position.x-5f, pointApareamiento.gameObject.transform.position.x + 30f);
+                        rand2 = Random.Range(pointApareamiento.gameObject.transform.position.z -10f, pointApareamiento.gameObject.transform.position.z + 30f);
 
-                    targetPosition = new Vector3(rand5, 0, rand6);
+                    } while ((rand1 > 40 && rand1 < 95) && (rand2 > 29 && rand2 < 70));
+
+                    targetPosition = new Vector3(rand1, 0, rand2);
                     cambio = false;
 
                     break;
 
                 case State.MovingRandomly:
-                    int rand7 = Random.Range(25, 180);
-                    int rand8 = Random.Range(-50, 110);
 
-                    targetPosition = new Vector3(rand7, 0, rand8);
+                  
+                    do
+                    {
+                        rand1 = Random.Range(25, 180);
+                        rand2 = Random.Range(-50, 110);
+
+                    } while ((rand1 > 40 && rand1 < 95) && (rand2 > 29 && rand2 < 70));
+                    targetPosition = new Vector3(rand1, 0, rand2);
+
                     cambio = false;
                     break;
 
@@ -189,23 +270,32 @@ public abstract class Animal : MonoBehaviour
             {
                 targetPosition = new Vector3(other.transform.position.x, 0, other.transform.position.z);
                 state = State.Comer;
-                cambio = true;
-            }          
+                startTimer = true;
+                timer = 0;
+
+                StopCoroutine(Pensar());
+            }
 
         }
         else if (carnivoro == false)
         {
-            if (other.gameObject.CompareTag("Carnivoro"))
+            if (other.gameObject.CompareTag("Carnivoro") && alertado != true)
             {
-                alertado = true;
-                StartCoroutine(Pensar());
-               
+                Animal objeto1 = other.gameObject.GetComponent<Animal>();
+                if (objeto1.state == State.BuscarComida)
+                {
+                    alertado = true;
+                    StartCoroutine(Pensar());
+                }                             
             }
             if (other.gameObject.CompareTag("Comida") && state == State.BuscarComida)
             {
                 targetPosition = new Vector3(other.transform.position.x, 0, other.transform.position.z);
                 state = State.Comer;
-                cambio = true;
+                startTimer = true;
+                timer = 0;
+                StopCoroutine(Pensar());
+              
             }
         }
 
@@ -222,6 +312,8 @@ public abstract class Animal : MonoBehaviour
                 objeto1.targetPosition = new Vector3(objeto2.transform.position.x, 0, objeto2.transform.position.z);
                 objeto2.state = State.Procrear;
                 objeto1.state = State.Procrear;
+                startTimer = true;
+                timer = 0;
                 cambio = true;
                 objeto1.cambio = true;
 
@@ -242,6 +334,8 @@ public abstract class Animal : MonoBehaviour
                 if (objeto.vida <=0)
                 {
                     Destroy(collision.gameObject);
+                    state = State.MovingRandomly;
+                    StartCoroutine(Pensar());
                     hambre += 60;
                     if (hambre>hambreMax)
                     {
@@ -256,6 +350,8 @@ public abstract class Animal : MonoBehaviour
             if (collision.gameObject.CompareTag("Comida") && state == State.Comer)
             {
                 Destroy(collision.gameObject);
+                state = State.MovingRandomly;
+                StartCoroutine(Pensar());
                 hambre += 40;
                 if (hambre > hambreMax)
                 {
@@ -267,58 +363,64 @@ public abstract class Animal : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Carnivoro") || collision.gameObject.CompareTag("Herviboro") && state == State.Procrear)
         {
-
             Animal objeto1 = collision.gameObject.GetComponent<Animal>();
-            Animal objeto2 = gameObject.GetComponent<Animal>();
-
-            objeto2.state = State.Procrear;
-            objeto1.state = State.Procrear;
-            cambio = true;
-            objeto1.cambio = true;
 
             if (nombre == objeto1.nombre && sexo != objeto1.sexo && objeto1.state == State.Procrear)
             {
-                objeto2.state = State.MovingRandomly;
-                objeto1.state = State.MovingRandomly;
-                cambio = true;
-                objeto1.cambio = true;
-                objeto2.cambio = true;
-
-                objeto2.hambre = hambre-50;
-                objeto1.hambre = hambre - 50;
-
-                objeto2.sed = sed - 70;
-                objeto1.sed = sed - 70;
+                Animal objeto2 = gameObject.GetComponent<Animal>();
                 if (generandoHijo == false)
                 {
-                    generandoHijo = true;
+                    generandoHijo = true;           
+                    objeto2.hambre = hambre - 50;
+                    objeto1.hambre = hambre - 50;
+                    objeto2.sed = sed - 50;
+                    objeto1.sed = sed - 50;
                     GeneracionHijo(objeto2, objeto1);
+                    objeto2.state = State.MovingRandomly;
+                    objeto1.state = State.MovingRandomly;                    
+                    objeto1.cambio = true;
+                    objeto2.cambio = true;
+                    StartCoroutine(creacion());
+                    StartCoroutine(Pensar());
+
                 }
 
-                
+
             }
 
         }
     }
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.CompareTag("Agua") && state == State.BuscarAgua)
+        if (sed<sedMax && other.gameObject.CompareTag("Agua"))
         {
-            sed+=1f;
-            if (sed>sedMax)
-            {
-                sed = sedMax;
-                cambio = true;
-                StartCoroutine(Pensar());
-            }
 
+            if (state == State.BuscarAgua)
+            {
+
+                sed += 1f;
+                if (sed > sedMax)
+                {
+                    sed = sedMax;
+                   
+                    StartCoroutine(Pensar());
+                }
+
+            }
         }
+      
+        
 
         if (carnivoro == true)
         {
             if (other.gameObject.CompareTag("Herviboro") && state == State.Comer)
             {
-                targetPosition = new Vector3(other.transform.position.x, 0, other.transform.position.z);               
+                targetPosition = new Vector3(other.transform.position.x, 0, other.transform.position.z);
+                StopCoroutine(Pensar());
+            }
+            else if(state == State.Comer)
+            {
+
             }
 
         }
@@ -331,7 +433,11 @@ public abstract class Animal : MonoBehaviour
         }
     }
    
-
+    IEnumerator creacion() 
+    {
+        yield return new WaitForSeconds(10f);
+        generandoHijo = false;
+    }
     IEnumerator Pensar()
     {
 
@@ -346,31 +452,32 @@ public abstract class Animal : MonoBehaviour
             else
             {
                 alertado = false;
-                StartCoroutine(Pensar());
             }
 
         }
-        else if (edad>=8 && hambre>=80 && sed>=80)
+        else if (edad>=10 && hambre>80 && sed>80)
         {
             float rand2 = Random.Range(fertilidad/ 2, 11);
             if (rand2 > 5)
             {
-                state = State.BuscarPareja;
-                cambio = true;
-            }
-            else
-            {
-                hambre=hambre - 20;
-                sed=sed - 20;
-            }
+                if (state != State.Procrear)
+                {
+                    state = State.BuscarPareja;
+                    cambio = true;
+                }
+            }           
             
         }
-        else if (hambre <= 100 || sed <= 100)
+        else if (hambre < 100 || sed < 100)
         {
             if (hambre < sed )
             {
-                state = State.BuscarComida;
-                cambio = true;
+                if (state != State.Comer)
+                {
+                    state = State.BuscarComida;
+                    cambio = true;
+                }
+                
 
             }
             else
@@ -383,36 +490,33 @@ public abstract class Animal : MonoBehaviour
         }       
         else
         {
-            if (Random.value < 0.1f)
-            {
+           
                 state = State.MovingRandomly;
                 cambio = true;
-            }
+            
         }
-
-
         
-            yield return new WaitForSeconds(5f);
 
         if (state == State.Escapar)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(10f);
             StartCoroutine(Pensar());
         }
         else if (state == State.Comer ||  state == State.Procrear)
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(5f);
             StartCoroutine(Pensar());
         }
         else
         {
+            yield return new WaitForSeconds(5f);
             StartCoroutine(Pensar());
         }
     }
 
     IEnumerator Tiempo()
     {
-        if (edad>20)
+        if (edad>30)
         {
             Destroy(gameObject);
         }
@@ -423,19 +527,23 @@ public abstract class Animal : MonoBehaviour
 
     IEnumerator Restador()
     {
-        hambre = hambre - 15 + resistencia;
-        sed = sed - 15 + resistencia;
+        hambre = hambre - 7 + resistencia/2;
+        sed = sed - 7 + resistencia/2;
+        if (hambre <0 || sed <0)
+        {
+            Destroy(gameObject);
+        }
         yield return new WaitForSeconds(10f);
-        StartCoroutine(Tiempo());
+        StartCoroutine(Restador());
     }
 
 
     public void GeneracionHijo(Animal animal1, Animal animal2) 
     {
 
-        Vector3 spawnPosition = new Vector3(animal1.transform.position.x, 0, animal1.transform.position.y);
+        Vector3 spawnPositionn = new Vector3(animal1.transform.position.x, 0.5f, animal1.transform.position.z);
         // Generar el objeto en la posición especificada
-        Animal newObj=Instantiate(animal1, spawnPosition, Quaternion.identity);
+        Animal newObj=Instantiate(animal1, spawnPositionn, Quaternion.identity);
 
 
         int random1 = Random.Range(0, 2);
@@ -592,9 +700,7 @@ public abstract class Animal : MonoBehaviour
 
         int rand1 = Random.Range(25, 180);
         int rand2 = Random.Range(-50, 110);
-        newObj.targetPosition = new Vector3(rand1, 0, rand2);
-
-       
+        newObj.targetPosition = new Vector3(rand1, 0, rand2);       
     }
 
 }

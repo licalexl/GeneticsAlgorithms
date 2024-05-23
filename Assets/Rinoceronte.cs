@@ -7,6 +7,7 @@ public class Rinoceronte : Animal
 
     protected override void Start()
     {
+        pointApareamiento = GameObject.Find("SpawnRino");
         nombre = "Rinoceronte";
         carnivoro = false;
         Generacion();

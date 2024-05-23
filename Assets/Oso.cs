@@ -7,6 +7,7 @@ public class Oso : Animal
 
     protected override void Start()
     {
+        pointApareamiento = GameObject.Find("SpawnOso");        
         nombre = "Oso";
         carnivoro = true;
         Generacion();
