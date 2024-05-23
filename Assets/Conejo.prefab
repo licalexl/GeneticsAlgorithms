@@ -1311,6 +1311,8 @@ MonoBehaviour:
   alertado: 0
   cambio: 0
   generandoHijo: 0
+  timer: 0
+  startTimer: 0
   ignorando: 0
   pointApareamiento: {fileID: 0}
   rotationSpeed: 5
