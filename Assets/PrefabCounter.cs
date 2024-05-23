@@ -37,34 +37,34 @@ public class PrefabCounter : MonoBehaviour
         countOso = 0;
         countTigre = 0;
 
-        foreach (GameObject obj in allObjects)
+        foreach (GameObject obj1 in allObjects)
         {
-            if (obj.name == prefabName)
+            if (obj1.name == prefabName)
             {
                 countConejo++;
             }
 
         }
 
-        foreach (GameObject obj in allObjects)
+        foreach (GameObject obj2 in allObjects)
         {
-            if (obj.name == prefabName1)
+            if (obj2.name == prefabName1)
             {
                 countFox++;
             }
         }
 
-        foreach (GameObject obj in allObjects)
+        foreach (GameObject obj3 in allObjects)
         {
-            if (obj.name == prefabName2)
+            if (obj3.name == prefabName2)
             {
                 countRino++;
             }
         }
 
-        foreach (GameObject obj in allObjects)
+        foreach (GameObject obj4 in allObjects)
         {
-            if (obj.name == prefabName3)
+            if (obj4.name == prefabName3)
             {
                 countRino++;
             }
